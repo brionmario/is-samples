@@ -32,6 +32,7 @@ class HomeComponent extends React.Component {
     };
 
     componentWillMount() {
+        // See if there is a valid session.
         if (isValidSession()) {
             const session = getAllSessionParameters();
             const _tokenResponse = {
@@ -50,7 +51,10 @@ class HomeComponent extends React.Component {
             return;
         }
 
+        // Reads the URL and retrieves the `code` param.
         const code = new URL(window.location.href).searchParams.get("code");
+
+        // If a authorization code exists, sends a token request.
         if (code) {
             sendTokenRequest(code)
                 .then(response => {
