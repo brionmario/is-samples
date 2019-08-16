@@ -22,46 +22,68 @@ import ISLogo from "./wso2_is.svg";
 import { sendAuthorizationRequest, sendTokenRequest } from "./actions/sign-in";
 import ReactJson from 'react-json-view'
 import {dispatchLogout} from "./actions/sign-out";
+import {isValidSession, getAllSessionParameters, decodeIdToken} from "./actions/session";
 
 class HomeComponent extends React.Component {
     state = {
-        isTokenRequestSuccess: false,
         idToken: {},
-        accessToken: {},
+        tokenResponse: {},
         isLoggedIn: false
     };
 
     componentWillMount() {
-        const code = new URL(window.location.href).searchParams.get("code");
+        if (isValidSession()) {
+            const session = getAllSessionParameters();
+            const _tokenResponse = {
+                access_token: session.ACCESS_TOKEN,
+                refresh_token: session.REFRESH_TOKEN,
+                scope: session.SCOPE,
+                id_token: session.ID_TOKEN,
+                token_type: session.TOKEN_TYPE,
+                expires_in: parseInt(session.EXPIRES_IN),
+            };
+            this.setState({
+                tokenResponse: _tokenResponse,
+                idToken: decodeIdToken(session.ID_TOKEN),
+                isLoggedIn: true
+            });
+            return;
+        }
 
+        const code = new URL(window.location.href).searchParams.get("code");
         if (code) {
             sendTokenRequest(code)
                 .then(response => {
                     console.log("TOKEN REQUEST SUCCESS", response);
                     this.setState({
-                        isTokenRequestSuccess: true,
-                        accessToken: response[0],
+                        tokenResponse: response[0],
                         idToken: response[1],
                         isLoggedIn: true
                     })
                 })
                 .catch((error => {
-                    this.setState({ isTokenRequestSuccess: false });
                     console.log("TOKEN REQUEST ERROR", error);
+                    this.setState({ isLoggedIn: false });
                 }));
         }
     }
 
+    /**
+     * Handles login button click
+     */
     handleLoginBtnClick = () => {
         sendAuthorizationRequest();
     };
 
+    /**
+     * Handles logout button click
+     */
     handleLogoutBtnClick = () => {
         dispatchLogout();
     };
 
     render() {
-        const { isTokenRequestSuccess, accessToken, idToken, isLoggedIn } = this.state;
+        const { tokenResponse, idToken, isLoggedIn } = this.state;
         return (
             <div className="container home-container">
                 <div className="wso2-logo-block">
@@ -71,28 +93,24 @@ class HomeComponent extends React.Component {
                 </div>
                 <br />
                 {
-                    isTokenRequestSuccess?
+                    isLoggedIn?
                         <>
-                            <h2>Access Token</h2>
+                            <br />
+                            <h2>Token Response</h2>
                             <div className="card access-request-block">
-                                <ReactJson src={accessToken} collapseStringsAfterLength={50} />
+                                <ReactJson src={tokenResponse} collapseStringsAfterLength={50} />
                             </div>
                             <br />
-                            <h2>ID Token Request</h2>
+                            <h2>ID Token</h2>
                             <div className="card token-request-block">
                                 <ReactJson src={idToken} collapseStringsAfterLength={50} />
                             </div>
+                            <br/>
+                            <button className="btn btn-danger" onClick={this.handleLogoutBtnClick}>LOGOUT</button>
                         </>
-                        : null
-                }
-                <br />
-                {
-                    isLoggedIn?
-                        <button className="btn btn-danger" onClick={this.handleLogoutBtnClick}>LOGOUT</button>
                         :
                         <button className="btn btn-primary" onClick={this.handleLoginBtnClick}>LOGIN</button>
                 }
-
             </div>
         )
     }
