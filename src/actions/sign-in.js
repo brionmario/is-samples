@@ -17,14 +17,23 @@
  */
 
 import axios from "axios";
-import {initAuthenticatedSession} from "./session";
+import {decodeIdToken, initAuthenticatedSession} from "./session";
 import {CONFIG} from "../config";
 
+/**
+ * Sends an authorization request.
+ */
 export const sendAuthorizationRequest = () => {
     let authorizeRequest = `${ CONFIG.AUTHORIZE_ENDPOINT }?response_type=${ CONFIG.RESPONSE_TYPE }&scope=${ CONFIG.SCOPE }&redirect_uri=${ CONFIG.REDIRECT_URI }&client_id=${ CONFIG.CLIENT_ID }`;
     window.location.href = authorizeRequest;
 };
 
+/**
+ * Sends a token request.
+ *
+ * @param code Authorization code
+ * @return {Promise<AxiosResponse<T> | never>}
+ */
 export const sendTokenRequest = (code) => {
     const body = [];
     body.push(`client_id=${ CONFIG.CLIENT_ID }`);
@@ -43,13 +52,18 @@ export const sendTokenRequest = (code) => {
             // Store the response in the session storage
             initAuthenticatedSession(response.data);
 
-            return [response.data, JSON.parse(atob(response.data.id_token.split(".")[1]))];
+            return [response.data, decodeIdToken(response.data.id_token)];
 
         }).catch((error) => {
             return Promise.reject(error);
         });
 };
 
+/**
+ * Helper to set request headers.
+ *
+ * @return {{headers: {Accept: string, "Access-Control-Allow-Origin": string, "Content-Type": string}}}
+ */
 const getTokenRequestHeaders = () => {
     return {
         headers: {
