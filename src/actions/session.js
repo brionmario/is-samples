@@ -16,38 +16,40 @@
  * under the License.
  */
 
+import {getCookie, removeCookie, setCookie} from "../helpers/cookies";
+
 /**
  * Initialize authenticated user session.\
  */
 export const initAuthenticatedSession = (data) => {
-    sessionStorage.setItem("ACCESS_TOKEN", data.access_token);
-    sessionStorage.setItem("REFRESH_TOKEN", data.refresh_token);
-    sessionStorage.setItem("SCOPE", data.scope);
-    sessionStorage.setItem("ID_TOKEN", data.id_token);
-    sessionStorage.setItem("TOKEN_TYPE", data.token_type);
-    sessionStorage.setItem("EXPIRES_IN", data.expires_in);
+    setCookie("ACCESS_TOKEN", data.access_token);
+    setCookie("REFRESH_TOKEN", data.refresh_token);
+    setCookie("SCOPE", data.scope);
+    setCookie("ID_TOKEN", data.id_token);
+    setCookie("TOKEN_TYPE", data.token_type);
+    setCookie("EXPIRES_IN", data.expires_in);
 };
 
 /**
- * Get parameter from session storage.
+ * Get session parameter from cookie storage.
  *
  * @param key
  * @return {string}
  */
 export const getSessionParameter = (key) => {
-    return sessionStorage.getItem(key);
+    return getCookie(key);
 };
 
 /**
  * Reset authenticated session.
  */
 export const resetAuthenticatedSession = () => {
-    sessionStorage.removeItem("ACCESS_TOKEN");
-    sessionStorage.removeItem("REFRESH_TOKEN");
-    sessionStorage.removeItem("SCOPE");
-    sessionStorage.removeItem("ID_TOKEN");
-    sessionStorage.removeItem("TOKEN_TYPE");
-    sessionStorage.removeItem("EXPIRES_IN");
+    removeCookie("ACCESS_TOKEN");
+    removeCookie("REFRESH_TOKEN");
+    removeCookie("SCOPE");
+    removeCookie("ID_TOKEN");
+    removeCookie("TOKEN_TYPE");
+    removeCookie("EXPIRES_IN");
 };
 
 /**
@@ -56,7 +58,7 @@ export const resetAuthenticatedSession = () => {
  * @return {boolean}
  */
 export const isValidSession = () => {
-    const token = sessionStorage.getItem("ACCESS_TOKEN");
+    const token = getCookie("ACCESS_TOKEN");
     return !!token;
 };
 
@@ -68,12 +70,12 @@ export const isValidSession = () => {
 export const getAllSessionParameters = () => {
     const session = {};
 
-    session["ACCESS_TOKEN"] = sessionStorage.getItem("ACCESS_TOKEN");
-    session["REFRESH_TOKEN"] = sessionStorage.getItem("REFRESH_TOKEN");
-    session["SCOPE"] = sessionStorage.getItem("SCOPE");
-    session["ID_TOKEN"] = sessionStorage.getItem("ID_TOKEN");
-    session["TOKEN_TYPE"] = sessionStorage.getItem("TOKEN_TYPE");
-    session["EXPIRES_IN"] = sessionStorage.getItem("EXPIRES_IN");
+    session["ACCESS_TOKEN"] = getCookie("ACCESS_TOKEN");
+    session["REFRESH_TOKEN"] = getCookie("REFRESH_TOKEN");
+    session["SCOPE"] = getCookie("SCOPE");
+    session["ID_TOKEN"] = getCookie("ID_TOKEN");
+    session["TOKEN_TYPE"] = getCookie("TOKEN_TYPE");
+    session["EXPIRES_IN"] = getCookie("EXPIRES_IN");
 
     return session;
 };
