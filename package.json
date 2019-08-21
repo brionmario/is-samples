@@ -13,6 +13,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "demo": "HTTPS=true PORT=9000 npm start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
