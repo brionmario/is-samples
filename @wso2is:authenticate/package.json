@@ -10,9 +10,11 @@
     ],
     "main": "src/index.js",
     "scripts": {
-        "build": "tsc -p tsconfig.release.json",
+        "build": "npm run clean && tsc -p tsconfig.release.json",
         "build:watch": "tsc -w -p tsconfig.release.json",
-        "lint": "tslint -t stylish --project \"tsconfig.json\""
+        "clean": "npm run rimraf build",
+        "lint": "tslint -t stylish --project \"tsconfig.json\"",
+        "rimraf": "./node_modules/rimraf/bin.js"
     },
     "author": "WSO2",
     "license": "Apache-2.0",
