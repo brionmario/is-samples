@@ -24,6 +24,7 @@
         "@types/crypto-js": "^3.1.43",
         "axios": "^0.18.0",
         "babel-loader": "^8.0.4",
+        "rimraf": "^3.0.0",
         "tslint": "^5.18.0",
         "tslint-microsoft-contrib": "^6.2.0",
         "typescript": "^3.5.3",
