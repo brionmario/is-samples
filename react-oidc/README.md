@@ -53,3 +53,39 @@ npm run demo-cmd
 npm run demo-pshell
 ```
 If the browser window doesn’t open automatically, manually navigate to the https://localhost:9000.
+
+## Allowing Cross Origin requests to the Identity Server.
+
+Cross origin requests will be blocked by default as a security measure.
+Since the app will be running on `https://localhost:9000`, you have to put the following CORS filter to the mentioned config file in WSO2 Identity Server distribution pack.
+
+```
+<IS_HOME>/repository/resources/conf/templates/repository/conf/tomcat/web.xml.j2
+```
+
+```xml
+<filter>
+    <filter-name>CORS</filter-name>
+    <filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
+    <init-param>
+        <param-name>cors.allowOrigin</param-name>
+        <param-value>https://localhost:9000</param-value>
+    </init-param>
+    <init-param>
+        <param-name>cors.supportedMethods</param-name>
+        <param-value>GET, HEAD, POST, DELETE, OPTIONS, PATCH, PUT</param-value>
+    </init-param>
+    <init-param>
+        <param-name>cors.exposedHeaders</param-name>
+        <param-value>Location</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>CORS</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+</filter-mapping>
+```
+
+Once you've added the above filter, restart the Identity Server.
